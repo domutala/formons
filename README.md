@@ -14,7 +14,7 @@ In summary, Formons provides a robust and versatile solution to simplify the cre
 
 ## install
 
-```sh
+```bash
 # yarn
 yarn add formons
 
@@ -24,7 +24,7 @@ npm install formons
 
 ## usage
 
-```javascript
+```ts
 import { create, use } from "form";
 
 const model = create({
