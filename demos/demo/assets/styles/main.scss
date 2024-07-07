@@ -1,0 +1,18 @@
+html,
+body {
+  overflow: auto;
+  background-color: rgba(var(--v-theme-background));
+}
+
+svg {
+  fill: currentColor;
+}
+
+i {
+  display: flex;
+}
+
+a {
+  text-decoration: none;
+  color: rgba(var(--v-theme-primary));
+}

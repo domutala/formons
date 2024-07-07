@@ -1,0 +1,4 @@
+node_modules
+src
+demos
+dist/*.d.ts.map
