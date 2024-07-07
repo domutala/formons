@@ -1,7 +1,10 @@
 {
   "name": "formons",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
+  "author": "domutala",
+  "repository": "https://github.com/domutala/formons",
+  "homepage": "https://github.com/domutala/formons#readme",
   "main": "dist/bundle.cjs.js",
   "module": "dist/bundle.esm.js",
   "browser": "dist/bundle.umd.js",
