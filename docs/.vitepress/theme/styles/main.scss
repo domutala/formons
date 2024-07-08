@@ -1,0 +1,28 @@
+.VPHome {
+  .VPHomeHero {
+    .text {
+      margin: auto;
+      max-width: 882px;
+      text-align: center;
+
+      @media (min-width: 960px) {
+        font-size: 102px;
+        line-height: 1.1;
+      }
+    }
+
+    .name {
+      margin: auto;
+      text-align: center;
+    }
+
+    .tagline {
+      margin: auto;
+      text-align: center;
+    }
+
+    .actions {
+      justify-content: center;
+    }
+  }
+}

@@ -3,6 +3,7 @@
   "version": "0.1.2",
   "license": "MIT",
   "author": "domutala",
+  "type": "module",
   "repository": "https://github.com/domutala/formons",
   "homepage": "https://github.com/domutala/formons#readme",
   "main": "dist/bundle.cjs.js",
@@ -10,17 +11,25 @@
   "browser": "dist/bundle.umd.js",
   "types": "dist/bundle.d.ts",
   "scripts": {
-    "build": "tsc && rollup -c --bundleConfigAsCjs"
+    "build": "tsc && rollup -c --bundleConfigAsCjs",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
+    "@iconify-json/carbon": "^1.1.36",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "^20.14.10",
+    "@unocss/preset-icons": "^0.61.3",
     "rollup": "^4.18.0",
     "rollup-plugin-dts": "^6.1.1",
     "ts-node": "^10.9.2",
     "tslib": "^2.6.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "unocss": "^0.61.3",
+    "unplugin-vue-components": "^0.27.2",
+    "vitepress": "^1.3.0"
   }
 }
