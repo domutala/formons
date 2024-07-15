@@ -1,13 +1,13 @@
-import type { Validator } from "../models";
+import { Model } from "../interfaces/Model";
 
-const fn: Validator = (schemaKey, model, args = {}) => {
+const fn = (model: Model, schemaKey: string, array = false) => {
   const index = model.schemasIndex[schemaKey];
-  model.schemas[index]._errors ||= [];
+  model.schemas[index].errors ||= [];
 
-  if (args.array) {
+  if (array) {
     if (typeof model.formValues[schemaKey] !== "undefined") {
       if (!Array.isArray(model.formValues[schemaKey])) {
-        model.schemas[index]._errors!.push(
+        model.schemas[index].errors!.push(
           `${schemaKey}_must_be_array_of_number`
         );
       } else {
@@ -25,8 +25,8 @@ const fn: Validator = (schemaKey, model, args = {}) => {
 
   function verify(value: any) {
     let message = `${schemaKey}_must_be_number`;
-    if (args.array) message = `${schemaKey}_must_be_array_of_number`;
-    if (typeof value !== "number") model.schemas[index]._errors!.push(message);
+    if (array) message = `${schemaKey}_must_be_array_of_number`;
+    if (typeof value !== "number") model.schemas[index].errors!.push(message);
   }
 
   return model;

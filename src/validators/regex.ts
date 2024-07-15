@@ -1,15 +1,18 @@
-import type { Validator } from "../models";
+import { Model } from "../interfaces/Model";
 
-const fn: Validator = (schemaKey, model, args = {}) => {
+const fn = (
+  model: Model,
+  schemaKey: string,
+  regex: RegExp,
+  options: { array?: boolean; message?: string } = {}
+) => {
   const index = model.schemasIndex[schemaKey];
-  model.schemas[index]._errors ||= [];
+  model.schemas[index].errors ||= [];
 
-  if (args.array) {
+  if (options.array) {
     if (typeof model.formValues[schemaKey] !== "undefined") {
       if (!Array.isArray(model.formValues[schemaKey])) {
-        model.schemas[index]._errors!.push(
-          `${schemaKey}_must_be_array_of_uuid`
-        );
+        model.schemas[index].errors!.push(`${schemaKey}_must_be_array_of_uuid`);
       } else {
         for (let i = 0; i < model.formValues[schemaKey].length; i++) {
           const value = model.formValues[schemaKey][i];
@@ -24,8 +27,8 @@ const fn: Validator = (schemaKey, model, args = {}) => {
   }
 
   function verify(value: any) {
-    const message = args.message || "regex_not_match";
-    if (!args.regex.test(value)) model.schemas[index]._errors!.push(message);
+    const message = options.message || "regex_not_match";
+    if (!regex.test(value)) model.schemas[index].errors!.push(message);
   }
 
   return model;
