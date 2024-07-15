@@ -7,8 +7,17 @@ export interface Schema {
 
   default?: any;
 
-  _events: SchemaEvents;
+  events: SchemaEvents;
   _interface: SchemaInterface;
+
+  /**
+   * validation functions are called before and after `Schema.onBeforeSubmit` the submit.
+   * They can also be called directly with the `Model.validate` function.
+   * The aim is to fill in `Model.isFormValid` and update `Schema._errors`.
+   * */
+  _validators: Array<SchemaValidator>;
+
+  errors: string[];
 }
 
 export interface SchemaInterface {
@@ -36,9 +45,15 @@ export interface SchemaEvents {
     | undefined;
 }
 
+export type SchemaValidator = {
+  fn: (model: Model, ...args: any) => Model | Promise<Model>;
+  args?: any;
+};
+
 // export type SchemaOptions = Partial<Schema> & Pick<Schema, "key">;
 export interface SchemaOptions {
   key: string;
   events?: SchemaEvents;
   interface?: SchemaInterface;
+  validators?: Array<SchemaValidator>;
 }

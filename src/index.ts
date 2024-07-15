@@ -1,110 +1,223 @@
-import type { Model, Plugin, Schema } from "./models";
-import onCreate from "./hooks/onCreate";
-import defu from "defu";
-import { build } from "./validators";
-import _plugins from "./plugins";
+import { Model } from "./interfaces/Model";
+import { SchemaOptions, Schema } from "./interfaces/Schema";
 
-export function create({
-  schemas,
-  base,
-  watch,
+export { default as validators } from "./validators";
+
+export async function create({
+  schemaOptions = [],
+  el,
+  base = {},
+  onSubmit,
+  onFormValuesChanged,
 }: {
-  schemas?: Partial<Schema>[];
+  schemaOptions?: SchemaOptions[];
+  /** l'élement qui contient le formulaire */
+  el?: HTMLFormElement;
 
   base?: { [schemaKey: string]: any };
 
-  /** cette fonction est appelée à chaque fois que la valeur de la formulaire change */
-  watch?: (model: Model) => Model;
-}) {
-  const _schemas = defu({ schemas: [] }, { schemas }).schemas as Schema[];
-  let formValues = (base ||= {});
+  onSubmit?(model: Model): void;
 
-  for (let i = 0; i < _schemas.length; i++) {
-    _schemas[i]._validators ||= {};
-    _schemas[i]._conditions ||= [];
-    _schemas[i]._interface ||= {};
+  onFormValuesChanged?(model: Model): void;
+} = {}) {
+  const schemas: Schema[] = [];
+  for (let i = 0; i < schemaOptions.length; i++) {
+    const schemaOption = schemaOptions[i];
 
-    if (
-      typeof _schemas[i].default !== "undefined" &&
-      typeof formValues[_schemas[i].key] === "undefined"
-    ) {
-      formValues[_schemas[i].key] = _schemas[i].default;
-    }
+    const schema: Schema = {
+      key: schemaOption.key,
+      events: schemaOption.events || {},
+      _interface: schemaOption.interface || {},
+      _validators: schemaOption.validators || [],
+      errors: [],
+    };
+
+    schemas.push(schema);
   }
 
-  const proxyHandler = {
-    set(obj: any, prop: string, value: any) {
-      if (
-        Object.prototype.toString.call(value) === "[object Object]" ||
-        Array.isArray(value)
-      ) {
-        obj[prop] = new Proxy(value, proxyHandler);
-      } else obj[prop] = value;
+  let model: Model = {
+    schemas: schemas,
+    formValues: base,
+    isFormValid: true,
+    el,
 
-      if (watch) _model = watch(_model);
+    schemasIndex: {},
 
-      return true;
+    async mount() {
+      let _this = this;
+
+      for (let i = 0; i < _this.schemas.length; i++) {
+        const schema = _this.schemas[i];
+
+        if (
+          typeof schema.default !== "undefined" &&
+          typeof _this.formValues[schema.key] === "undefined"
+        ) {
+          this.formValues[schema.key] = schema.default;
+        }
+      }
+
+      async function runOnMountedFunctions() {
+        for (let i = 0; i < schemas.length; i++) {
+          const schema = schemas[i];
+
+          if (window) {
+            const el = document.querySelector(
+              `[formons-shema="${schema.key}"]`
+            );
+
+            if (el) schema._interface.el = el;
+          }
+
+          if (schema.events.onMounted) {
+            _this = await schema.events.onMounted(schema.key, model);
+          }
+
+          schemas[i] = schema;
+        }
+      }
+
+      await runOnMountedFunctions();
+
+      if (window && _this.el) _this.el.addEventListener("submit", submit);
+
+      return _this;
+    },
+
+    submit() {
+      this.el?.submit();
+    },
+
+    async validate() {
+      await runValidators();
+      return this.isFormValid;
     },
   };
 
-  function buildProxy(obj: Array<any> | Object) {
-    const proxy = new Proxy(obj, proxyHandler);
-    for (const key in proxy) {
-      if (Object.prototype.hasOwnProperty.call(proxy, key)) {
+  function setSchemasIndex() {
+    function schemaIndexGetter() {
+      const schemasIndex = model.schemas.reduce((obj, schema, index) => {
+        obj[schema.key] = index;
+        return obj;
+      }, {} as { [x: string]: number });
+
+      return schemasIndex;
+    }
+    function schemaIndexSetter() {
+      return true;
+    }
+    Object.defineProperty(model, "schemasIndex", {
+      get: schemaIndexGetter,
+      set: schemaIndexSetter,
+      enumerable: true,
+      configurable: true,
+    });
+  }
+  setSchemasIndex();
+
+  function setIsFormValid() {
+    function getter() {
+      const isValid = !model.schemas.some(
+        (item) => item.errors && item.errors.length > 0
+      );
+
+      return isValid;
+    }
+    function setter() {
+      return true;
+    }
+    Object.defineProperty(model, "isFormValid", {
+      get: getter,
+      set: setter,
+      enumerable: true,
+      configurable: true,
+    });
+  }
+  setIsFormValid();
+
+  function createProxy() {
+    const proxyHandler = {
+      set(obj: any, prop: string, value: any) {
         if (
-          Object.prototype.toString.call(proxy[key]) === "[object Object]" ||
-          Array.isArray(proxy[key])
+          Object.prototype.toString.call(value) === "[object Object]" ||
+          Array.isArray(value)
         ) {
-          proxy[key] = new Proxy(proxy[key], proxyHandler);
+          obj[prop] = new Proxy(value, proxyHandler);
+        } else obj[prop] = value;
+
+        if (onFormValuesChanged) onFormValuesChanged(model);
+
+        return true;
+      },
+    };
+
+    function buildProxy(obj: Array<any> | Object) {
+      const proxy = new Proxy(obj, proxyHandler);
+      for (const key in proxy) {
+        if (Object.prototype.hasOwnProperty.call(proxy, key)) {
+          if (
+            Object.prototype.toString.call(proxy[key]) === "[object Object]" ||
+            Array.isArray(proxy[key])
+          ) {
+            proxy[key] = new Proxy(proxy[key], proxyHandler);
+          }
         }
       }
+
+      return proxy;
     }
 
-    return proxy;
+    model.formValues = buildProxy(model.formValues);
+  }
+  createProxy();
+
+  async function runValidators() {
+    for (let i = 0; i < schemas.length; i++) {
+      const schema = schemas[i];
+
+      for (let v = 0; v < schema._validators.length; v++) {
+        const validator = schema._validators[v];
+        model = await validator.fn(model, ...(validator.args || []));
+      }
+    }
   }
 
-  /** @ts-ignore */
-  let _model: Model = {
-    schemas: _schemas,
-    formValues: defu({}, formValues),
-  };
+  async function submit(e: Event) {
+    e.preventDefault();
 
-  _model = build(_model);
-  if (!base) _model = onCreate(_model);
-  else console.log("update");
+    if (model.el) {
+      async function runOnBeforeSubmitFunctions() {
+        for (let i = 0; i < schemas.length; i++) {
+          const schema = schemas[i];
+          if (schema.events.onBeforeSubmit) {
+            model = await schema.events.onBeforeSubmit(schema.key, model);
+          }
+        }
+      }
 
-  function schemaIndexGetter() {
-    const schemasIndex = _model.schemas.reduce((obj, schema, index) => {
-      obj[schema.key] = index;
-      return obj;
-    }, {} as { [x: string]: number });
+      await runOnBeforeSubmitFunctions();
+      await runValidators();
 
-    return schemasIndex;
-  }
-  function schemaIndexSetter() {
-    return true;
-  }
-  Object.defineProperty(_model, "schemasIndex", {
-    get: schemaIndexGetter,
-    set: schemaIndexSetter,
-    enumerable: true,
-    configurable: true,
-  });
-
-  for (const plugin of plugins) {
-    _model = plugin.fn(_model, plugin.args);
+      if (onSubmit) onSubmit(model);
+    }
   }
 
-  _model.formValues = buildProxy(_model.formValues);
+  /**
+   * Run onModelCreate functions
+   */
+  async function runOnModelCreateFunctions() {
+    for (let i = 0; i < model.schemas.length; i++) {
+      model.schemas[i].errors = [];
+      if (model.schemas[i].events.onModelCreated) {
+        model = await model.schemas[i].events.onModelCreated!(
+          model.schemas[i].key,
+          model
+        );
+      }
+    }
+  }
 
-  return _model;
+  await runOnModelCreateFunctions();
+
+  return model;
 }
-
-export function use(
-  fn: (model: Model, args?: { [key: string]: any }) => Model,
-  args?: { [key: string]: any }
-) {
-  plugins.push({ fn, args });
-}
-
-const plugins: Plugin[] = [..._plugins];

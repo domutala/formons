@@ -25,73 +25,45 @@ npm install formons
 ## usage
 
 ```ts
-import { create, use } from "form";
+import { create, validators } from "formons";
 
 const model = create({
-  schemas: [
-    {
-      key: "id",
-      onCreate: "generateUUID",
-
-      _validators: {
-        uuid: true,
-        required: true,
-      },
-
-      _interface: {
-        hidden: true,
-      },
-    },
+  schemaOptions: [
     {
       key: "name",
 
-      _validators: {
-        string: true,
-        required: true,
-      },
-
-      _interface: {
-        type: "string",
-      },
-    },
-    {
-      key: "info",
-
-      _interface: {
-        type: "alert",
-        props: {
-          color: "info",
-          text: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vel laborum non voluptates rerum? Distinctio, delectus corrupti porro impedit vel animi debitis ab, eum corporis accusantium quod cum, dignissimos vero excepturi!",
+      validators: [
+        {
+          fn: validators.required,
+          args: ["name"],
         },
-      },
-    },
-    {
-      key: "lien",
+        {
+          fn: function (model, length: number) {
+            if (typeof model.formValues.name !== "undefined") {
+              if (`${model.formValues.name}`.length !== length) {
+                model.schemas[model.schemasIndex.name].errors!.push(
+                  `name_length_must_be_${length}`
+                );
+              }
+            }
 
-      _validators: {
-        required: true,
-        regex: {
-          fn: "regex",
-          args: {
-            regex:
-              /^(https?:\/\/)?([\w-]+(\.[\w-]+)+)(\/[\w-]*)*(\?.*)?(#.*)?$/,
-            message: "must_be_url",
+            return model;
           },
+          args: [5],
         },
-      },
+      ],
+    },
+    {
+      key: "age",
 
-      _interface: {
-        type: "url",
-        componentProps: {
-          label: "url",
+      validators: [
+        {
+          fn: validators.number,
+          args: ["age"],
         },
-      },
+      ],
     },
   ],
-  watch: function (model) {
-    // do something
-    return model;
-  },
 });
 ```
 

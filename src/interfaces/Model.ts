@@ -7,11 +7,13 @@ export interface Model {
 
   el?: HTMLFormElement;
 
-  // readonly schemasIndex: { [schemaKey: string]: number };
+  isFormValid: boolean;
 
-  // formValues: { [schemaKey: string]: any };
+  schemasIndex: { [schemaKey: string]: number };
 
   mount(): Promise<Model>;
 
   submit(): void;
+
+  validate(): Promise<boolean>;
 }

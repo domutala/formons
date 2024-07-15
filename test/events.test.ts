@@ -3,7 +3,7 @@
  */
 
 import { Model } from "../src/interfaces/Model";
-import { create } from "../src/main";
+import { create } from "../src";
 
 describe("events", () => {
   beforeEach(() => {
@@ -16,6 +16,8 @@ describe("events", () => {
   });
 
   test("onModelCreated", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     const form = document.createElement("form") as HTMLFormElement;
     const onModelCreatedSpy = jest.fn();
 
@@ -38,8 +40,9 @@ describe("events", () => {
   });
 
   test("onMounted", async () => {
-    const form = document.createElement("form") as HTMLFormElement;
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
+    const form = document.createElement("form") as HTMLFormElement;
     const onMountedSpy = jest.fn();
 
     const model = await create({
@@ -63,6 +66,8 @@ describe("events", () => {
   });
 
   test("onFormValuesChanged", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     const form = document.createElement("form") as HTMLFormElement;
     const onFormValuesChangedSpy = jest.fn();
 
@@ -81,6 +86,8 @@ describe("events", () => {
   });
 
   test("onBeforeSubmit", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     const form = document.createElement("form") as HTMLFormElement;
     const onBeforeSubmitSpy = jest.fn();
 
@@ -107,6 +114,8 @@ describe("events", () => {
   });
 
   test("onSubmit", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     const form = document.createElement("form") as HTMLFormElement;
     const onSubmitSpy = jest.fn();
 
@@ -127,6 +136,8 @@ describe("events", () => {
   });
 
   test("customEvent", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     const form = document.createElement("form") as HTMLFormElement;
     const ononBeforeSaveSpy = jest.fn();
 
@@ -147,8 +158,8 @@ describe("events", () => {
 
     function saveData(model: Model) {
       model.schemas.forEach((schema) => {
-        if (schema._events.onBeforeSave) {
-          schema._events.onBeforeSave(schema.key, model);
+        if (schema.events.onBeforeSave) {
+          schema.events.onBeforeSave(schema.key, model);
         }
       });
     }
