@@ -3,13 +3,7 @@ import { SchemaOptions, Schema } from "./interfaces/Schema";
 
 export { default as validators } from "./validators";
 
-export async function create({
-  schemaOptions = [],
-  el,
-  base = {},
-  onSubmit,
-  onFormValuesChanged,
-}: {
+export interface Options {
   schemaOptions?: SchemaOptions[];
   /** l'élement qui contient le formulaire */
   el?: HTMLFormElement;
@@ -19,7 +13,15 @@ export async function create({
   onSubmit?(model: Model): void;
 
   onFormValuesChanged?(model: Model): void;
-} = {}) {
+}
+
+export async function create({
+  schemaOptions = [],
+  el,
+  base = {},
+  onSubmit,
+  onFormValuesChanged,
+}: Options = {}) {
   const schemas: Schema[] = [];
   for (let i = 0; i < schemaOptions.length; i++) {
     const schemaOption = schemaOptions[i];
