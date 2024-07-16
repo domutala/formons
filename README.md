@@ -77,6 +77,148 @@ const model = create({
 model.mount(document.querySelector("#form"));
 ```
 
-## Documentation 📚
+## validators
 
-The comprehensive documentation for Formons is currently under construction. To get started, it is recommended to use the well-written typing to begin.
+In order to be able to execute validators by priority, they have been transformed into an array since version 0.2.0. Validator priority based on schema order and order of arrival in `Schema.validators`.
+
+```ts
+export interface SchemaInterface {
+  /** formons-shema="key" */
+  el?: Element;
+  [key: string]: any;
+}
+
+export interface Schema {
+  // --
+
+  /**
+   * validation functions are called before submitting form and after `Schema.onBeforeSubmit`.
+   * They can also be called directly with the `Model.validate` function.
+   *
+   * The aim is to fill in `Model.isFormValid` and update `Schema.errors`.
+   *
+   * Validator priority based on schema order and order of arrival in `Schema.validators`.
+   * */
+  validators: Array<SchemaValidator>;
+
+  // ---
+}
+```
+
+## Events 🆕
+
+Execute functions at different stages of your form.
+
+```ts
+export interface Schema {
+  // ---
+
+  events: SchemaEvents;
+
+  // ---
+}
+
+export interface SchemaEvents {
+  /** After creating the model */
+  onModelCreated?: (key: string, model: Model) => Model | Promise<Model>;
+
+  /** This function is called after the `Model.mount` function has been called. */
+  onMounted?: (key: string, model: Model) => Model | Promise<Model>;
+
+  /** this function is called before the form is submitted */
+  onBeforeSubmit?: (key: string, model: Model) => Model | Promise<Model>;
+
+  /** custom event like `onSave` for example  */
+  [funcName: string]:
+    | ((key: string, model: Model) => Model | Promise<Model>)
+    | undefined;
+}
+```
+
+### onModelCreated
+
+After creating the model
+
+```ts
+onModelCreated?: (key: string, model: Model) => Model | Promise<Model>;
+```
+
+#### Example
+
+```ts
+await create({
+  schemaOptions: [
+    {
+      key: "name",
+      events: {
+        async onModelCreated(key, model) {
+          // your logic here
+
+          return model;
+        },
+      },
+    },
+  ],
+});
+```
+
+### onMounted
+
+This function is called after the `Model.mount` function has been called.
+
+```ts
+onMounted?: (key: string, model: Model) => Model | Promise<Model>;
+```
+
+#### Example
+
+```ts
+const model = await create({
+  schemaOptions: [{ key: "test" }],
+
+  onFormValuesChanged(model) {
+    onFormValuesChangedSpy(model);
+  },
+});
+```
+
+```ts
+onBeforeSubmit?: (key: string, model: Model) => Model | Promise<Model>;
+```
+
+### custom event
+
+custom event like `onSave` for example
+
+#### Example
+
+```ts
+const model = await create({
+  schemaOptions: [
+    {
+      key: "name",
+      events: {
+        async onBeforeSave(key, model) {
+          return model;
+        },
+      },
+    },
+  ],
+});
+
+function saveData(model: Model) {
+  model.schemas.forEach((schema) => {
+    if (schema.events.onBeforeSave) {
+      schema.events.onBeforeSave(schema.key, model);
+    }
+  });
+}
+
+saveData(model);
+```
+
+## Author
+
+<img width="48" style="border-radius: 100%" src="https://avatars.githubusercontent.com/u/33329431" alt="Mamadou DIA - domutala">
+
+Mamadou [@domutala](https://github.com/domutala)

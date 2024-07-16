@@ -28,8 +28,8 @@ export async function create({
     const schema: Schema = {
       key: schemaOption.key,
       events: schemaOption.events || {},
-      _interface: schemaOption.interface || {},
-      _validators: schemaOption.validators || [],
+      interface: schemaOption.interface || {},
+      validators: schemaOption.validators || [],
       errors: [],
     };
 
@@ -67,7 +67,7 @@ export async function create({
               `[formons-shema="${schema.key}"]`
             );
 
-            if (el) schema._interface.el = el;
+            if (el) schema.interface.el = el;
           }
 
           if (schema.events.onMounted) {
@@ -176,8 +176,8 @@ export async function create({
     for (let i = 0; i < schemas.length; i++) {
       const schema = schemas[i];
 
-      for (let v = 0; v < schema._validators.length; v++) {
-        const validator = schema._validators[v];
+      for (let v = 0; v < schema.validators.length; v++) {
+        const validator = schema.validators[v];
         model = await validator.fn(model, ...(validator.args || []));
       }
     }

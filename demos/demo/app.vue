@@ -14,36 +14,36 @@ const model = ref(
         key: "id",
         onCreate: "generateUUID",
 
-        _validators: {
+        validators: {
           uuid: true,
           required: true,
         },
 
-        _interface: {
+        interface: {
           hidden: true,
         },
       },
       {
         key: "name",
 
-        _validators: {
+        validators: {
           string: true,
           required: true,
         },
 
-        _interface: {
+        interface: {
           type: "string",
         },
       },
       {
         key: "mytype",
 
-        _validators: {
+        validators: {
           mytype: true,
           required: true,
         },
 
-        _interface: {
+        interface: {
           type: "mytype",
           componentProps: {
             width: "1/2",
@@ -54,12 +54,12 @@ const model = ref(
       {
         key: "address",
 
-        _validators: {
+        validators: {
           string: true,
           required: false,
         },
 
-        _interface: {
+        interface: {
           type: "string",
           componentProps: {
             placeholder: "Your addess",
@@ -70,12 +70,12 @@ const model = ref(
       {
         key: "age",
 
-        _validators: {
+        validators: {
           number: true,
           required: true,
         },
 
-        _interface: {
+        interface: {
           type: "number",
           placeholder: "Your age",
         },
@@ -84,12 +84,12 @@ const model = ref(
         key: "sexe",
         default: 1,
 
-        _validators: {
+        validators: {
           string: true,
           required: true,
         },
 
-        _interface: {
+        interface: {
           type: "select",
           items: [
             { title: "Homme", value: 1, props: { icon: "yeah 1" } },
@@ -103,11 +103,11 @@ const model = ref(
       {
         key: "manager",
 
-        _validators: {
+        validators: {
           // required: true,
         },
 
-        _interface: {
+        interface: {
           type: "boolean",
           props: {
             color: "primary",
@@ -117,11 +117,11 @@ const model = ref(
       {
         key: "alert",
 
-        _validators: {
+        validators: {
           // required: true,
         },
 
-        _interface: {
+        interface: {
           type: "alert",
           props: {
             color: "info",
@@ -132,7 +132,7 @@ const model = ref(
       {
         key: "lien",
 
-        _validators: {
+        validators: {
           required: true,
           regex: {
             fn: "regex",
@@ -144,7 +144,7 @@ const model = ref(
           },
         },
 
-        _interface: {
+        interface: {
           type: "url",
           componentProps: {
             label: "url",
@@ -161,10 +161,10 @@ function onFormvaluesChange() {
   const age = Number(model.value.formValues.age);
 
   if (!isNaN(age) && age < 18) {
-    model.value.schemas[model.value.schemasIndex.address]._interface.hidden =
+    model.value.schemas[model.value.schemasIndex.address].interface.hidden =
       true;
   } else {
-    model.value.schemas[model.value.schemasIndex.address]._interface.hidden =
+    model.value.schemas[model.value.schemasIndex.address].interface.hidden =
       false;
   }
 
@@ -179,13 +179,13 @@ onMounted(() => {});
     <v-container>
       <v-form @submit.prevent="model.validate()" class="dform">
         <template v-for="schema in model.schemas" :key="schema.key">
-          <template v-if="!schema._interface.hidden">
+          <template v-if="!schema.interface.hidden">
             <div
               class="dform-schema--container"
-              :class="[schema._interface.componentProps?.width]"
+              :class="[schema.interface.componentProps?.width]"
             >
               <v-text-field
-                v-if="schema._interface.type === 'boolean'"
+                v-if="schema.interface.type === 'boolean'"
                 :error-messages="schema._errors"
                 rounded="lg"
                 variant="outlined"
@@ -195,7 +195,7 @@ onMounted(() => {});
                 <template #prepend>
                   <v-switch
                     v-model="model.formValues[schema.key]"
-                    v-bind="schema._interface.props"
+                    v-bind="schema.interface.props"
                     inset
                     hide-details
                   ></v-switch>
@@ -203,10 +203,10 @@ onMounted(() => {});
               </v-text-field>
 
               <v-select
-                v-else-if="schema._interface.type === 'select'"
-                :items="schema._interface.items"
+                v-else-if="schema.interface.type === 'select'"
+                :items="schema.interface.items"
                 v-model="model.formValues[schema.key]"
-                v-bind="schema._interface.componentProps"
+                v-bind="schema.interface.componentProps"
                 rounded="lg"
                 variant="outlined"
                 bg-color="rgba(var(--v-theme-on-background), 0.03)"
@@ -231,15 +231,15 @@ onMounted(() => {});
                 </template>
               </v-select>
               <v-alert
-                v-else-if="schema._interface.type === 'alert'"
-                v-bind="schema._interface.props"
+                v-else-if="schema.interface.type === 'alert'"
+                v-bind="schema.interface.props"
               >
               </v-alert>
               <v-text-field
                 v-else
                 v-model="model.formValues[schema.key]"
-                v-bind="schema._interface.componentProps"
-                :type="schema._interface.type"
+                v-bind="schema.interface.componentProps"
+                :type="schema.interface.type"
                 :error-messages="schema._errors"
                 rounded="lg"
                 variant="outlined"

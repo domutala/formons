@@ -8,14 +8,17 @@ export interface Schema {
   default?: any;
 
   events: SchemaEvents;
-  _interface: SchemaInterface;
+  interface: SchemaInterface;
 
   /**
-   * validation functions are called before and after `Schema.onBeforeSubmit` the submit.
+   * validation functions are called before submitting form and after `Schema.onBeforeSubmit`.
    * They can also be called directly with the `Model.validate` function.
-   * The aim is to fill in `Model.isFormValid` and update `Schema._errors`.
+   *
+   * The aim is to fill in `Model.isFormValid` and update `Schema.errors`.
+   *
+   * Validator priority based on schema order and order of arrival in `Schema.validators`.
    * */
-  _validators: Array<SchemaValidator>;
+  validators: Array<SchemaValidator>;
 
   errors: string[];
 }
@@ -23,17 +26,14 @@ export interface Schema {
 export interface SchemaInterface {
   /** formons-shema="key" */
   el?: Element;
-  metas?: { [key: string]: any };
+  [key: string]: any;
 }
 
 export interface SchemaEvents {
-  /** au moment de création du model */
+  /** After creating the model */
   onModelCreated?: (key: string, model: Model) => Model | Promise<Model>;
 
-  /**
-   * This function is called when the element managing
-   * this schema is mounted in the dom
-   * */
+  /** This function is called after the `Model.mount` function has been called. */
   onMounted?: (key: string, model: Model) => Model | Promise<Model>;
 
   /** this function is called before the form is submitted */
