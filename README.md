@@ -24,6 +24,14 @@ npm install formons
 
 ## usage
 
+```html
+<form id="form">
+  <input type="text" formons-shema="name" placeholder="name" />
+  <input type="number" formons-shema="age" placeholder="age" />
+  <button type="submit">Click me</button>
+</form>
+```
+
 ```ts
 import { create, validators } from "formons";
 
@@ -65,6 +73,8 @@ const model = create({
     },
   ],
 });
+
+model.mount(document.querySelector("#form"));
 ```
 
 ## Documentation 📚
