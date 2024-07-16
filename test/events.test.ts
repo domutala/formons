@@ -18,10 +18,9 @@ describe("events", () => {
   test("onModelCreated", async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    const form = document.createElement("form") as HTMLFormElement;
     const onModelCreatedSpy = jest.fn();
 
-    const model = await create({
+    await create({
       schemaOptions: [
         {
           key: "test",
@@ -33,7 +32,6 @@ describe("events", () => {
           },
         },
       ],
-      el: form,
     });
 
     expect(onModelCreatedSpy).toHaveBeenCalled();
@@ -57,10 +55,9 @@ describe("events", () => {
           },
         },
       ],
-      el: form,
     });
 
-    await model.mount();
+    await model.mount(form);
 
     expect(onMountedSpy).toHaveBeenCalled();
   });
@@ -68,12 +65,10 @@ describe("events", () => {
   test("onFormValuesChanged", async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    const form = document.createElement("form") as HTMLFormElement;
     const onFormValuesChangedSpy = jest.fn();
 
     const model = await create({
       schemaOptions: [{ key: "test" }],
-      el: form,
 
       onFormValuesChanged(model) {
         onFormValuesChangedSpy(model);
@@ -103,10 +98,9 @@ describe("events", () => {
           },
         },
       ],
-      el: form,
     });
 
-    await model.mount();
+    await model.mount(form);
     model.submit();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -121,14 +115,13 @@ describe("events", () => {
 
     const model = await create({
       schemaOptions: [{ key: "test" }],
-      el: form,
 
       onSubmit(model) {
         onSubmitSpy(model);
       },
     });
 
-    await model.mount();
+    await model.mount(form);
     model.submit();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -138,7 +131,6 @@ describe("events", () => {
   test("customEvent", async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    const form = document.createElement("form") as HTMLFormElement;
     const ononBeforeSaveSpy = jest.fn();
 
     const model = await create({
@@ -153,7 +145,6 @@ describe("events", () => {
           },
         },
       ],
-      el: form,
     });
 
     function saveData(model: Model) {

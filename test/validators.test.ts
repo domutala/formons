@@ -35,10 +35,9 @@ describe("validators", () => {
           ],
         },
       ],
-      el: form,
     });
 
-    await model.mount();
+    await model.mount(form);
     model.submit();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -76,11 +75,10 @@ describe("validators", () => {
           ],
         },
       ],
-      el: form,
       base: { test: "333" },
     });
 
-    await model.mount();
+    await model.mount(form);
     model.submit();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -90,7 +88,6 @@ describe("validators", () => {
   test("callValidate", async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    const form = document.createElement("form") as HTMLFormElement;
     const isValidatorCalledSpy = jest.fn();
 
     const model = await create({
@@ -118,7 +115,6 @@ describe("validators", () => {
           ],
         },
       ],
-      el: form,
       base: { test: "333" },
     });
 
@@ -132,8 +128,6 @@ describe("validators", () => {
   test("useValidator", async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    const form = document.createElement("form") as HTMLFormElement;
-
     const model = await create({
       schemaOptions: [
         {
@@ -146,7 +140,6 @@ describe("validators", () => {
           ],
         },
       ],
-      el: form,
       base: { test: "this is string" },
     });
 

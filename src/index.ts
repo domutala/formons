@@ -6,7 +6,7 @@ export { default as validators } from "./validators";
 export interface Options {
   schemaOptions?: SchemaOptions[];
   /** l'élement qui contient le formulaire */
-  el?: HTMLFormElement;
+  //
 
   base?: { [schemaKey: string]: any };
 
@@ -17,7 +17,6 @@ export interface Options {
 
 export async function create({
   schemaOptions = [],
-  el,
   base = {},
   onSubmit,
   onFormValuesChanged,
@@ -41,11 +40,11 @@ export async function create({
     schemas: schemas,
     formValues: base,
     isFormValid: true,
-    el,
 
     schemasIndex: {},
 
-    async mount() {
+    async mount(form?: HTMLFormElement) {
+      this.el = form;
       let _this = this;
 
       for (let i = 0; i < _this.schemas.length; i++) {

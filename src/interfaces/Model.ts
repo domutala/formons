@@ -11,7 +11,7 @@ export interface Model {
 
   schemasIndex: { [schemaKey: string]: number };
 
-  mount(): Promise<Model>;
+  mount(el?: HTMLFormElement): Promise<Model>;
 
   submit(): void;
 
