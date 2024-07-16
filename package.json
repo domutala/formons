@@ -1,6 +1,6 @@
 {
   "name": "formons",
-  "version": "0.1.2",
+  "version": "0.2.2",
   "license": "MIT",
   "author": "domutala",
   "type": "module",
@@ -10,6 +10,11 @@
   "module": "dist/bundle.esm.js",
   "browser": "dist/bundle.umd.js",
   "types": "dist/bundle.d.ts",
+  "keywords": [
+    "formons",
+    "form",
+    "generator"
+  ],
   "scripts": {
     "build": "tsc && rollup -c --bundleConfigAsCjs",
     "docs:dev": "vitepress dev docs",
