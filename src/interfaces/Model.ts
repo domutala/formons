@@ -13,6 +13,8 @@ export interface Model {
 
   schemasIndex: { [schemaKey: string]: number };
 
+  metas: { [key: string]: any };
+
   mount(el?: HTMLFormElement): Promise<Model>;
 
   submit(): void;

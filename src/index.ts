@@ -10,6 +10,8 @@ export interface Options {
 
   base?: { [schemaKey: string]: any };
 
+  metas?: { [key: string]: any };
+
   onSubmit?(model: Model): void;
 
   onFormValuesChanged?(model: Model): void;
@@ -19,6 +21,7 @@ export async function create({
   name,
   schemaOptions = [],
   base = {},
+  metas = {},
   onSubmit,
   onFormValuesChanged,
 }: Options = {}) {
@@ -42,8 +45,8 @@ export async function create({
     schemas: schemas,
     formValues: base,
     isFormValid: true,
-
     schemasIndex: {},
+    metas,
 
     async mount(form?: HTMLFormElement) {
       this.el = form;
