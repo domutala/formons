@@ -4,9 +4,9 @@ import { SchemaOptions, Schema } from "./interfaces/Schema";
 export { default as validators } from "./validators";
 
 export interface Options {
+  name?: string;
+
   schemaOptions?: SchemaOptions[];
-  /** l'élement qui contient le formulaire */
-  //
 
   base?: { [schemaKey: string]: any };
 
@@ -16,6 +16,7 @@ export interface Options {
 }
 
 export async function create({
+  name,
   schemaOptions = [],
   base = {},
   onSubmit,
@@ -37,6 +38,7 @@ export async function create({
   }
 
   let model: Model = {
+    name,
     schemas: schemas,
     formValues: base,
     isFormValid: true,
