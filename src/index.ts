@@ -8,6 +8,12 @@ export interface Options {
 
   schemaOptions?: SchemaOptions[];
 
+  /**
+   * set null to disable schema key validation
+   * @default /^[a-zA-Z0-9_]+$/ example: 'my_key'
+   *  */
+  schemaKeyValidator?: RegExp | null;
+
   base?: { [schemaKey: string]: any };
 
   metas?: { [key: string]: any };
@@ -20,6 +26,7 @@ export interface Options {
 export async function create({
   name,
   schemaOptions = [],
+  schemaKeyValidator = /^[a-zA-Z0-9_]+$/,
   base = {},
   metas = {},
   onSubmit,
@@ -28,6 +35,13 @@ export async function create({
   const schemas: Schema[] = [];
   for (let i = 0; i < schemaOptions.length; i++) {
     const schemaOption = schemaOptions[i];
+
+    if (
+      schemaKeyValidator !== null &&
+      !schemaKeyValidator.test(schemaOption.key)
+    ) {
+      throw `'${schemaOption.key}': shema key is invalid`;
+    }
 
     const schema: Schema = {
       key: schemaOption.key,

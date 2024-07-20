@@ -50,10 +50,5 @@ export type SchemaValidator = {
   args?: any;
 };
 
-// export type SchemaOptions = Partial<Schema> & Pick<Schema, "key">;
-export interface SchemaOptions {
-  key: string;
-  events?: SchemaEvents;
-  interface?: SchemaInterface;
-  validators?: Array<SchemaValidator>;
-}
+export type SchemaOptions = Omit<Partial<Schema>, "errors"> &
+  Pick<Schema, "key">;
