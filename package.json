@@ -1,6 +1,6 @@
 {
   "name": "formons",
-  "version": "0.2.4",
+  "version": "0.2.41",
   "license": "MIT",
   "author": "domutala",
   "type": "module",
@@ -20,7 +20,8 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "test": "jest --config"
+    "test": "jest --config",
+    "prepublish": "yarn build"
   },
   "devDependencies": {
     "@iconify-json/carbon": "^1.1.36",
